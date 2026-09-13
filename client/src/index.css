@@ -1,0 +1,46 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  /* Pixel-style retro borders */
+  .pixel-border {
+    border: 3px solid #30363d;
+    box-shadow: 
+      inset -3px -3px 0px 0px rgba(0,0,0,0.5),
+      inset 3px 3px 0px 0px rgba(255,255,255,0.1),
+      4px 4px 0px 0px rgba(0,0,0,0.8);
+  }
+
+  .pixel-border-gold {
+    border: 3px solid #d97706;
+    box-shadow: 
+      inset -3px -3px 0px 0px rgba(180, 83, 9, 0.6),
+      inset 3px 3px 0px 0px rgba(254, 243, 199, 0.4),
+      4px 4px 0px 0px rgba(0,0,0,0.8);
+  }
+
+  .pixel-btn {
+    transition: transform 0.05s ease, box-shadow 0.05s ease;
+  }
+  .pixel-btn:active {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.8);
+  }
+}
+
+/* Custom RPG Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #0d1117;
+}
+::-webkit-scrollbar-thumb {
+  background: #30363d;
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #8957e5;
+}
