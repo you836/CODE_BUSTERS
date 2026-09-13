@@ -1,8 +1,17 @@
 import axios from 'axios';
 
+let rawBaseUrl = (import.meta.env.VITE_API_URL || '/api').trim();
+// Strip trailing slashes
+rawBaseUrl = rawBaseUrl.replace(/\/+$/, '');
+
+// If the user provided a full domain without /api (e.g. https://life-rpg-hivv.onrender.com), normalize it
+if (rawBaseUrl.startsWith('http') && !rawBaseUrl.endsWith('/api')) {
+  rawBaseUrl = `${rawBaseUrl}/api`;
+}
+
 const api = axios.create({
-  baseURL:  import.meta.env.VITE_API_URL || '/api',
-})
+  baseURL: rawBaseUrl,
+});
 
 // Request Interceptor: Attach JWT Bearer token if present
 api.interceptors.request.use(

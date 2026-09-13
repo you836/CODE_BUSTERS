@@ -21,11 +21,18 @@ connectDB().then(() => {
 app.use(cors());
 app.use(express.json());
 
-// API Routes
+// API Routes (supports both /api/auth and /auth for flexible routing)
 app.use('/api/auth', authRoutes);
+app.use('/auth', authRoutes);
+
 app.use('/api/quests', questRoutes);
+app.use('/quests', questRoutes);
+
 app.use('/api/shop', shopRoutes);
+app.use('/shop', shopRoutes);
+
 app.use('/api/ai', aiRoutes);
+app.use('/ai', aiRoutes);
 
 // Welcome & Health Check
 const statusHandler = (req, res) => {
