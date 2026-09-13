@@ -2,15 +2,16 @@ import React, { useState } from 'react';
 import { GoogleLogin } from '@react-oauth/google';
 import { useAuthStore } from '../store/useAuthStore.js';
 import { sounds } from '../utils/soundEffects.js';
-import { Sparkles, Sword, Zap, AlertCircle } from 'lucide-react';
+import { Sparkles, Sword, AlertCircle, Eye, EyeOff, Lock, Mail, User } from 'lucide-react';
 
 export default function AuthModal() {
-  const { login, register, demoLogin, googleLogin, isLoading, error } = useAuthStore();
+  const { login, register, googleLogin, isLoading, error } = useAuthStore();
 
   const [isRegister, setIsRegister] = useState(false);
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const isGoogleConfigured = Boolean(import.meta.env.VITE_GOOGLE_CLIENT_ID);
 
@@ -22,11 +23,6 @@ export default function AuthModal() {
     } else {
       await login(email, password);
     }
-  };
-
-  const handleDemo = async () => {
-    sounds.playLevelUp();
-    await demoLogin();
   };
 
   const handleGoogleSuccess = async (credentialResponse) => {
@@ -48,8 +44,8 @@ export default function AuthModal() {
 
       <div className="w-full max-w-md bg-rpg-panel border-4 border-rpg-gold rounded-lg shadow-glow-gold p-6 relative z-10">
         {/* Banner */}
-        <div className="text-center mb-6">
-          <div className="inline-block p-3 rounded-full bg-rpg-dark border-2 border-rpg-gold mb-3 shadow-pixel-sm">
+        <div className="text-center mb-5">
+          <div className="inline-block p-3 rounded-full bg-rpg-dark border-2 border-rpg-gold mb-2 shadow-pixel-sm">
             <Sword className="w-8 h-8 text-rpg-gold" />
           </div>
           <h1 className="font-pixel text-base text-rpg-gold tracking-wide uppercase drop-shadow">
@@ -60,23 +56,8 @@ export default function AuthModal() {
           </p>
         </div>
 
-        {/* 1-Click Instant Demo Button (For Judges & Instant Access) */}
-        <div className="mb-4">
-          <button
-            onClick={handleDemo}
-            disabled={isLoading}
-            className="w-full py-3 px-4 rounded bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-black font-pixel text-xs font-bold shadow-pixel border-2 border-yellow-200 transition active:translate-y-0.5 flex items-center justify-center gap-2"
-          >
-            <Zap className="w-4 h-4 text-black fill-black" />
-            1-Click Demo Adventurer
-          </button>
-          <p className="text-[11px] text-center text-slate-400 font-mono mt-1.5">
-            Instant access with a Level 1 hero & starter productivity quests
-          </p>
-        </div>
-
         {/* Google OAuth Sign-In */}
-        <div className="mb-5">
+        <div className="mb-4">
           {isGoogleConfigured ? (
             <div className="flex justify-center w-full">
               <div className="w-full flex justify-center bg-slate-900/70 p-1.5 rounded border border-slate-700 hover:border-rpg-gold transition shadow-pixel-sm">
@@ -104,10 +85,10 @@ export default function AuthModal() {
           )}
         </div>
 
-        <div className="relative flex py-2 items-center mb-4">
+        <div className="relative flex py-1.5 items-center mb-3">
           <div className="flex-grow border-t border-rpg-border"></div>
           <span className="flex-shrink mx-3 text-[10px] font-mono uppercase text-slate-500">
-            or sign into your adventurer account
+            {isRegister ? 'forge new adventurer profile' : 'or enter with credentials'}
           </span>
           <div className="flex-grow border-t border-rpg-border"></div>
         </div>
@@ -121,10 +102,13 @@ export default function AuthModal() {
         )}
 
         {/* Auth Form */}
-        <form onSubmit={handleSubmit} className="space-y-4 font-mono">
+        <form onSubmit={handleSubmit} className="space-y-3.5 font-mono">
           {isRegister && (
             <div>
-              <label htmlFor="auth-username-input" className="block text-xs text-slate-300 mb-1 font-semibold">Hero Call-Sign (Username)</label>
+              <label htmlFor="auth-username-input" className="block text-xs text-slate-300 mb-1 font-semibold flex items-center gap-1.5">
+                <User className="w-3.5 h-3.5 text-slate-400" />
+                Hero Call-Sign (Username)
+              </label>
               <input
                 id="auth-username-input"
                 type="text"
@@ -138,7 +122,10 @@ export default function AuthModal() {
           )}
 
           <div>
-            <label htmlFor="auth-email-input" className="block text-xs text-slate-300 mb-1 font-semibold">Scroll Address (Email)</label>
+            <label htmlFor="auth-email-input" className="block text-xs text-slate-300 mb-1 font-semibold flex items-center gap-1.5">
+              <Mail className="w-3.5 h-3.5 text-slate-400" />
+              Scroll Address (Email)
+            </label>
             <input
               id="auth-email-input"
               type="email"
@@ -151,29 +138,49 @@ export default function AuthModal() {
           </div>
 
           <div>
-            <label htmlFor="auth-password-input" className="block text-xs text-slate-300 mb-1 font-semibold">Passkey</label>
-            <input
-              id="auth-password-input"
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              className="w-full bg-rpg-dark border border-rpg-border rounded px-3 py-2 text-xs text-white outline-none focus:border-rpg-gold focus-visible:ring-2 focus-visible:ring-rpg-gold"
-            />
+            <label htmlFor="auth-password-input" className="block text-xs text-slate-300 mb-1 font-semibold flex items-center gap-1.5">
+              <Lock className="w-3.5 h-3.5 text-slate-400" />
+              Passkey (Password)
+            </label>
+            <div className="relative">
+              <input
+                id="auth-password-input"
+                type={showPassword ? 'text' : 'password'}
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                className="w-full bg-rpg-dark border border-rpg-border rounded pl-3 pr-10 py-2 text-xs text-white outline-none focus:border-rpg-gold focus-visible:ring-2 focus-visible:ring-rpg-gold"
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  sounds.playClick();
+                  setShowPassword(!showPassword);
+                }}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-rpg-gold transition p-1"
+              >
+                {showPassword ? (
+                  <EyeOff className="w-4 h-4" />
+                ) : (
+                  <Eye className="w-4 h-4" />
+                )}
+              </button>
+            </div>
           </div>
 
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full py-2.5 rounded bg-purple-700 hover:bg-purple-600 text-white font-pixel text-xs font-bold shadow-pixel border border-purple-400 transition active:translate-y-0.5 focus-visible:ring-2 focus-visible:ring-purple-400"
+            className="w-full py-2.5 rounded bg-purple-700 hover:bg-purple-600 text-white font-pixel text-xs font-bold shadow-pixel border border-purple-400 transition active:translate-y-0.5 focus-visible:ring-2 focus-visible:ring-purple-400 mt-2"
           >
             {isLoading ? 'Consulting the Oracle...' : isRegister ? 'Forge Adventurer' : 'Enter Realm'}
           </button>
         </form>
 
         {/* Toggle Login / Register */}
-        <div className="mt-5 text-center">
+        <div className="mt-4 text-center">
           <button
             onClick={() => { sounds.playClick(); setIsRegister(!isRegister); }}
             className="text-xs font-mono text-slate-400 hover:text-rpg-gold underline transition"
@@ -187,4 +194,5 @@ export default function AuthModal() {
     </div>
   );
 }
+
 

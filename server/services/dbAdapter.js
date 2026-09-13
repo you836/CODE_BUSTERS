@@ -530,3 +530,84 @@ export async function findInventoryItemByItemId(userId, itemId) {
              inv.quantity >= 1
   ) || null;
 }
+
+/**
+ * Ensures a pre-configured demo user (demo@liferpg.com / password123) exists with starter quests
+ */
+export async function seedDefaultDemoUser() {
+  try {
+    const demoEmail = 'demo@liferpg.com';
+    let user = await findUserByEmail(demoEmail);
+    if (!user) {
+      user = await createUser({
+        username: 'DemoAdventurer',
+        email: demoEmail,
+        password: 'password123',
+      });
+    }
+
+    // Ensure starter quests exist for demo user
+    const existingQuests = await findQuestsByUser(user._id);
+    if (!existingQuests || existingQuests.length === 0) {
+      const starterQuests = [
+        {
+          userId: user._id,
+          title: 'Morning Hydration & 10-Min Stretch',
+          description: 'Drink a full glass of water and stretch to energize for the day.',
+          category: 'Health',
+          difficulty: 'Easy',
+          questType: 'Daily',
+          xpReward: 25,
+          goldReward: 10,
+          verificationType: 'Casual',
+          status: 'Pending',
+        },
+        {
+          userId: user._id,
+          title: '25-Minute Focus Deep Work Session',
+          description: 'Turn off notifications and engage in single-task focus.',
+          category: 'Work',
+          difficulty: 'Medium',
+          questType: 'Daily',
+          xpReward: 75,
+          goldReward: 30,
+          verificationType: 'Timed',
+          minDurationMinutes: 25,
+          status: 'Pending',
+        },
+        {
+          userId: user._id,
+          title: 'Read 10 Pages & Write Key Takeaway',
+          description: 'Read 10 pages of non-fiction or code docs and write a short reflection.',
+          category: 'Study',
+          difficulty: 'Medium',
+          questType: 'Daily',
+          xpReward: 75,
+          goldReward: 30,
+          verificationType: 'Verified',
+          proofRequired: 'Summarize 1-2 core insights from your reading session.',
+          status: 'Pending',
+        },
+        {
+          userId: user._id,
+          title: 'Draft System Architecture & Data Flow',
+          description: 'Sketch out module interactions and endpoint contracts before coding.',
+          category: 'Study',
+          difficulty: 'Hard',
+          questType: 'MainQuest',
+          xpReward: 175,
+          goldReward: 75,
+          verificationType: 'Casual',
+          status: 'Pending',
+        },
+      ];
+
+      for (const questData of starterQuests) {
+        await createQuest(questData);
+      }
+    }
+  } catch (err) {
+    console.error('Demo user initialization note:', err.message);
+  }
+}
+

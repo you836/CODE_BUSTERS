@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { connectDB } from './config/db.js';
+import { seedDefaultDemoUser } from './services/dbAdapter.js';
 import authRoutes from './routes/authRoutes.js';
 import questRoutes from './routes/questRoutes.js';
 import shopRoutes from './routes/shopRoutes.js';
@@ -12,7 +13,9 @@ dotenv.config();
 const app = express();
 
 // Connect to Database (with intelligent local persistence fallback)
-connectDB();
+connectDB().then(() => {
+  seedDefaultDemoUser();
+});
 
 // Middleware
 app.use(cors());

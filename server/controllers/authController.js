@@ -36,6 +36,52 @@ export async function registerUser(req, res) {
       password,
     });
 
+    // Seed starter quests for the new adventurer
+    const starterQuests = [
+      {
+        userId: user._id,
+        title: 'Morning Hydration & 10-Min Stretch',
+        description: 'Drink a full glass of water and stretch to energize for the day.',
+        category: 'Health',
+        difficulty: 'Easy',
+        questType: 'Daily',
+        xpReward: 25,
+        goldReward: 10,
+        verificationType: 'Casual',
+        status: 'Pending',
+      },
+      {
+        userId: user._id,
+        title: '25-Minute Focus Deep Work Session',
+        description: 'Turn off notifications and engage in single-task focus.',
+        category: 'Work',
+        difficulty: 'Medium',
+        questType: 'Daily',
+        xpReward: 75,
+        goldReward: 30,
+        verificationType: 'Timed',
+        minDurationMinutes: 25,
+        status: 'Pending',
+      },
+      {
+        userId: user._id,
+        title: 'Read 10 Pages & Write Key Takeaway',
+        description: 'Read 10 pages of non-fiction or code docs and write a short reflection.',
+        category: 'Study',
+        difficulty: 'Medium',
+        questType: 'Daily',
+        xpReward: 75,
+        goldReward: 30,
+        verificationType: 'Verified',
+        proofRequired: 'Summarize 1-2 core insights from your reading session.',
+        status: 'Pending',
+      },
+    ];
+
+    for (const questData of starterQuests) {
+      await createQuest(questData);
+    }
+
     res.status(201).json({
       _id: user._id,
       username: user.username,
