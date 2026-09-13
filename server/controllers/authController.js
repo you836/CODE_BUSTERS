@@ -10,6 +10,7 @@ import {
   updateUser,
   findQuestsByUser,
   createQuest,
+  seedDefaultDemoUser,
 } from '../services/dbAdapter.js';
 
 /**
@@ -113,7 +114,12 @@ export async function loginUser(req, res) {
       return res.status(400).json({ message: 'Please provide email and password.' });
     }
 
-    const user = await findUserByEmail(email);
+    let user = await findUserByEmail(email);
+    if (!user && (email.toLowerCase() === 'demo@liferpg.com' || email.toLowerCase() === 'demo@realm.com')) {
+      await seedDefaultDemoUser();
+      user = await findUserByEmail(email);
+    }
+
     if (!user) {
       return res.status(401).json({ message: 'Invalid credentials. No adventurer found.' });
     }

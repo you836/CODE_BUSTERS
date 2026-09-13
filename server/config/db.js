@@ -10,7 +10,16 @@ export let isConnectedToMongo = false;
 
 export async function connectDB() {
   const uri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/life-rpg';
-  
+  const isCloudEnv = Boolean(process.env.RENDER || process.env.VERCEL || process.env.NODE_ENV === 'production');
+  const isLocalHostUri = uri.includes('127.0.0.1') || uri.includes('localhost');
+
+  if (isCloudEnv && isLocalHostUri) {
+    isConnectedToMongo = false;
+    console.log('🛡️  [Life RPG] Cloud environment detected without MongoDB Atlas URI.');
+    console.log('✨ Auto-engaging Life RPG Persistent Storage engine!');
+    return;
+  }
+
   console.log('⚔️  [Life RPG] Attempting database connection...');
 
   try {
