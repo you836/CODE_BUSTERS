@@ -4,6 +4,7 @@
   "private": true,
   "description": "Life RPG — Transform Real-World Productivity into an Epic RPG Experience",
   "scripts": {
+    "build": "cd client && npm install && npm run build",
     "server": "cd server && npm run dev",
     "client": "cd client && npm run dev",
     "start": "cd server && npm start"
