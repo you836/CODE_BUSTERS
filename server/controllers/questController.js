@@ -157,6 +157,42 @@ export async function startTimedQuest(req, res) {
 }
 
 /**
+ * @desc    Reset a Timed Quest Focus Session
+ * @route   POST /api/quests/:id/reset-timer
+ * @access  Private
+ */
+export async function resetTimedQuest(req, res) {
+  try {
+    const quest = await findQuestById(req.params.id);
+    if (!quest) {
+      return res.status(404).json({ message: 'Quest not found.' });
+    }
+
+    // Ownership check
+    if (quest.userId.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'Unauthorized: You do not own this quest.' });
+    }
+
+    if (quest.status === 'Completed') {
+      return res.status(400).json({ message: 'Completed quests cannot be reset.' });
+    }
+
+    const updated = await dbUpdateQuest(quest._id, {
+      status: 'Pending',
+      startedAt: null,
+    });
+
+    res.json({
+      message: 'Focus timer reset successfully.',
+      quest: updated,
+    });
+  } catch (error) {
+    console.error('Error resetting timed quest:', error);
+    res.status(500).json({ message: 'Failed to reset focus timer.' });
+  }
+}
+
+/**
  * @desc    Submit Proof / Reflection for a Verified Quest
  * @route   POST /api/quests/:id/verify
  * @access  Private

@@ -6,6 +6,7 @@ import {
   deleteQuest,
   completeQuest,
   startTimedQuest,
+  resetTimedQuest,
   submitProof,
 } from '../controllers/questController.js';
 import { protect } from '../middleware/auth.js';
@@ -25,8 +26,9 @@ router.route('/:id')
 // The Core Game Loop Endpoint
 router.patch('/:id/complete', completeQuest);
 
-// New endpoints for timed quest start and proof submission
+// Endpoints for timed quest start, reset, and proof submission
 router.post('/:id/start', startTimedQuest);
+router.post('/:id/reset-timer', resetTimedQuest);
 router.post('/:id/verify', submitProof);
 
 export default router;

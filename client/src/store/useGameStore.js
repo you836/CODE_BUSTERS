@@ -90,6 +90,29 @@ export const useGameStore = create((set, get) => ({
     }
   },
 
+  // Reset a running timed focus session
+  resetTimedQuest: async (id) => {
+    // Optimistic reset
+    set((state) => ({
+      quests: state.quests.map((q) =>
+        q._id === id ? { ...q, status: 'Pending', startedAt: null } : q
+      ),
+    }));
+
+    try {
+      const { data } = await api.post(`/quests/${id}/reset-timer`);
+      set((state) => ({
+        quests: state.quests.map((q) => (q._id === id ? data.quest : q)),
+      }));
+      sounds.playClick();
+      get().showToast('Focus timer reset.');
+      return true;
+    } catch (error) {
+      get().showToast(error.response?.data?.message || 'Failed to reset focus timer', 'error');
+      return false;
+    }
+  },
+
   // Submit evidence/reflection for a verified quest.
   submitProof: async (id, proof) => {
     try {
