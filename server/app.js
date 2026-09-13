@@ -27,15 +27,20 @@ app.use('/api/quests', questRoutes);
 app.use('/api/shop', shopRoutes);
 app.use('/api/ai', aiRoutes);
 
-// Health Check
-app.get('/api/health', (req, res) => {
+// Welcome & Health Check
+const statusHandler = (req, res) => {
   res.json({
     status: 'online',
-    realm: 'Life RPG',
+    realm: 'Life RPG Backend Engine',
     time: new Date().toISOString(),
     message: 'The realm gates are open and awaiting heroes.',
   });
-});
+};
+
+app.get('/', statusHandler);
+app.get('/api', statusHandler);
+app.get('/api/health', statusHandler);
+app.get('/health', statusHandler);
 
 // 404 Handler
 app.use((req, res) => {
