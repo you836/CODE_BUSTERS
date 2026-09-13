@@ -103,36 +103,59 @@ export const STARTER_ITEMS = [
   }
 ];
 
-function readLocalDB() {
-  const dir = path.dirname(dbFilePath);
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
+let inMemoryDB = null;
 
-  if (!fs.existsSync(dbFilePath)) {
-    const initialData = {
+function getDbFilePath() {
+  if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_VERSION) {
+    return path.join('/tmp', 'db.json');
+  }
+  return path.join(__dirname, '..', 'data', 'db.json');
+}
+
+function readLocalDB() {
+  if (inMemoryDB) return inMemoryDB;
+
+  const dbFilePath = getDbFilePath();
+  const dir = path.dirname(dbFilePath);
+  try {
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+  } catch (e) {}
+
+  let data = null;
+  try {
+    if (fs.existsSync(dbFilePath)) {
+      data = JSON.parse(fs.readFileSync(dbFilePath, 'utf8'));
+    }
+  } catch (e) {}
+
+  if (!data) {
+    data = {
       users: [],
       quests: [],
       items: [...STARTER_ITEMS],
       inventory: [],
     };
-    fs.writeFileSync(dbFilePath, JSON.stringify(initialData, null, 2));
-    return initialData;
-  }
-  try {
-    const data = JSON.parse(fs.readFileSync(dbFilePath, 'utf8'));
-    if (!data.items || data.items.length === 0) {
-      data.items = [...STARTER_ITEMS];
+    try {
       fs.writeFileSync(dbFilePath, JSON.stringify(data, null, 2));
-    }
-    return data;
-  } catch {
-    return { users: [], quests: [], items: [...STARTER_ITEMS], inventory: [] };
+    } catch (e) {}
   }
+
+  if (!data.items || data.items.length === 0) {
+    data.items = [...STARTER_ITEMS];
+  }
+
+  inMemoryDB = data;
+  return inMemoryDB;
 }
 
 function writeLocalDB(data) {
-  fs.writeFileSync(dbFilePath, JSON.stringify(data, null, 2));
+  inMemoryDB = data;
+  const dbFilePath = getDbFilePath();
+  try {
+    fs.writeFileSync(dbFilePath, JSON.stringify(data, null, 2));
+  } catch (e) {}
 }
 
 // ---------------- USER ADAPTERS ----------------
